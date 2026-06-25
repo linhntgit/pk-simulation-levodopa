@@ -245,29 +245,29 @@ with tab_model:
             DA_brain([Brain DA])
         end
 
-        Tablet -- Rate_rel_C --> C_gi
-        Tablet -- Rate_rel_L --> L_gi
+        Tablet -- "Rate_rel_C" --> C_gi
+        Tablet -- "Rate_rel_L" --> L_gi
 
-        C_gi -- ka_C * F_C --> C_cent
-        L_gi -- ka_L * F_L --> L_cent
+        C_gi -- "ka_C * F_C" --> C_cent
+        L_gi -- "ka_L * F_L" --> L_cent
 
-        C_cent -- k12_C --> C_peri
-        C_peri -- k21_C --> C_cent
-        C_cent -- kel_C --> ExC((Urine))
+        C_cent -- "k12_C" --> C_peri
+        C_peri -- "k21_C" --> C_cent
+        C_cent -- "kel_C" --> ExC((Urine))
 
-        L_cent -- k12_L --> L_peri
-        L_peri -- k21_L --> L_cent
+        L_cent -- "k12_L" --> L_peri
+        L_peri -- "k21_L" --> L_cent
 
-        L_cent -- kAADC\n(inhibited by C) --> DA_peri
-        DA_peri -- kel_DA --> ExD((Excreted))
+        L_cent -- "kAADC<br>(inhibited by C)" --> DA_peri
+        DA_peri -- "kel_DA" --> ExD((Excreted))
 
-        L_cent -- kCOMT --> 3OMD
+        L_cent -- "kCOMT" --> 3OMD
         
-        L_cent -- kin_BBB\n(LAT) --> L_brain
-        L_brain -- kout_BBB --> L_cent
+        L_cent -- "kin_BBB<br>(LAT)" --> L_brain
+        L_brain -- "kout_BBB" --> L_cent
 
-        L_brain -- kAADC_brain --> DA_brain
-        DA_brain -- kel_DA_brain --> ExDb((Excreted))
+        L_brain -- "kAADC_brain" --> DA_brain
+        DA_brain -- "kel_DA_brain" --> ExDb((Excreted))
         
         classDef plasma fill:#E3F2FD,stroke:#1976D2,stroke-width:2px,color:#0D47A1;
         classDef brain fill:#E8F5E9,stroke:#388E3C,stroke-width:2px,color:#1B5E20;
