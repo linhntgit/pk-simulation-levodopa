@@ -296,3 +296,31 @@ with tab_model:
         class Tablet form;
     """
     mermaid(mermaid_code)
+    
+    st.markdown("---")
+    st.markdown("<h3 style='color: #2C3E50;'>📚 Model Explanation & Mathematical Equations</h3>", unsafe_allow_html=True)
+    st.markdown("""
+    This mathematical model uses a system of Ordinary Differential Equations (ODEs) to represent drug mass transfer. 
+    It combines **Pharmacokinetics** (absorption, two-compartment distribution, elimination) with **Pharmacodynamics/Metabolism** (enzyme inhibition via an $IC_{50}$ model).
+    """)
+    
+    with st.expander("🔬 Carbidopa Equations (AADC Inhibitor)", expanded=False):
+        st.markdown("Carbidopa inhibits the AADC enzyme in the peripheral blood but does not cross the Blood-Brain Barrier (BBB).")
+        st.latex(r"\frac{dC_{gi}}{dt} = Rate_{rel, C} - k_{a,C} \cdot C_{gi}")
+        st.latex(r"\frac{dC_{cent}}{dt} = F_C \cdot k_{a,C} \cdot C_{gi} - k_{el,C} \cdot C_{cent} - k_{12,C} \cdot C_{cent} + k_{21,C} \cdot C_{peri}")
+        st.latex(r"\frac{dC_{peri}}{dt} = k_{12,C} \cdot C_{cent} - k_{21,C} \cdot C_{peri}")
+        st.markdown("**AADC Enzyme Inhibition (Emax Model):**")
+        st.latex(r"Act_{AADC} = \frac{IC_{50}}{IC_{50} + C_{plasma}} \quad \text{where } C_{plasma} = \frac{C_{cent}}{V_{c,C}}")
+    
+    with st.expander("💊 Levodopa Equations (Prodrug)", expanded=False):
+        st.markdown("Levodopa is a prodrug that is transported across the BBB by the LAT transporter. In the periphery, its metabolism to Dopamine is inhibited by Carbidopa.")
+        st.latex(r"\frac{dL_{gi}}{dt} = Rate_{rel, L} - k_{a,L} \cdot L_{gi}")
+        st.latex(r"\frac{dL_{cent}}{dt} = F_L \cdot k_{a,L} \cdot L_{gi} - \underbrace{(k_{AADC} \cdot Act_{AADC} + k_{COMT}) \cdot L_{cent}}_{\text{Metabolism}} - \underbrace{k_{12,L} \cdot L_{cent} + k_{21,L} \cdot L_{peri}}_{\text{Distribution}} - \underbrace{k_{in,BBB} \cdot L_{cent} + k_{out,BBB} \cdot L_{brain}}_{\text{BBB Transport}}")
+        st.latex(r"\frac{dL_{peri}}{dt} = k_{12,L} \cdot L_{cent} - k_{21,L} \cdot L_{peri}")
+        st.latex(r"\frac{dL_{brain}}{dt} = k_{in,BBB} \cdot L_{cent} - k_{out,BBB} \cdot L_{brain} - k_{AADC,brain} \cdot L_{brain}")
+        
+    with st.expander("🧠 Dopamine Equations (Active Metabolite)", expanded=False):
+        st.markdown("**Peripheral Dopamine** (causes side effects like nausea and cardiovascular issues):")
+        st.latex(r"\frac{dDA_{peri}}{dt} = (k_{AADC} \cdot Act_{AADC}) \cdot L_{cent} - k_{el,DA} \cdot DA_{peri}")
+        st.markdown("**Brain Dopamine** (provides therapeutic Parkinson's relief):")
+        st.latex(r"\frac{dDA_{brain}}{dt} = k_{AADC,brain} \cdot L_{brain} - k_{el,DA,brain} \cdot DA_{brain}")
