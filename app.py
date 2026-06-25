@@ -222,6 +222,19 @@ with tab_dashboard:
     
     st.plotly_chart(fig, use_container_width=True)
 
+    st.markdown("---")
+    st.subheader("📋 Simulation Results Data")
+    st.dataframe(results_df.style.format("{:.4f}"), height=300, use_container_width=True)
+    
+    csv_data = results_df.to_csv(index=False).encode('utf-8')
+    st.download_button(
+        label="📥 Download Simulation Data as CSV",
+        data=csv_data,
+        file_name='pk_simulation_results.csv',
+        mime='text/csv',
+        type='primary'
+    )
+
 with tab_model:
     st.markdown("<h3 style='text-align: center; color: #2C3E50;'>Compartmental Pharmacokinetic Model</h3>", unsafe_allow_html=True)
     mermaid_code = """
