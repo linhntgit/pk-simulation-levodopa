@@ -66,36 +66,69 @@ else:
             'Carbidopa_Released_mg': [0.0, 8.75, 15.0, 25.0, 42.5, 50.0, 50.0]
         })
 
+# --- Helper for Slider + Number Input ---
+def slider_input(label, min_val, max_val, default_val, step, key):
+    if key not in st.session_state:
+        st.session_state[key] = default_val
+    
+    # Split label into short title and description
+    parts = label.split(" - ")
+    short_label = parts[0]
+    desc = parts[1] if len(parts) > 1 else ""
+    
+    st.markdown(f"**{short_label}** <span style='color:gray;font-size:0.85em'>- {desc}</span>", unsafe_allow_html=True)
+    col1, col2 = st.columns([2.5, 1])
+    
+    slider_key = f"{key}_sl"
+    num_key = f"{key}_num"
+    
+    def sync_sl():
+        st.session_state[key] = st.session_state[slider_key]
+    def sync_num():
+        st.session_state[key] = st.session_state[num_key]
+        
+    with col1:
+        st.slider("Hidden", min_value=min_val, max_value=max_val, value=st.session_state[key], step=step, key=slider_key, on_change=sync_sl, label_visibility="collapsed")
+    with col2:
+        st.number_input("Hidden", min_value=min_val, max_value=max_val, value=st.session_state[key], step=step, key=num_key, on_change=sync_num, label_visibility="collapsed")
+        
+    return st.session_state[key]
+
+
 # --- Parameters Sidebar ---
 st.sidebar.markdown("---")
-st.sidebar.header("⚙️ Pharmacokinetic Parameters (Dog ~12kg)")
+st.sidebar.header("⚙️ Pharmacokinetic Parameters")
 
-with st.sidebar.expander("Carbidopa Parameters", expanded=False):
-    ka_C = st.slider("ka_C (1/h) - Absorption Rate", 0.1, 5.0, 1.04, step=0.01)
-    F_C = st.slider("F_C - Bioavailability", 0.1, 1.0, 0.88, step=0.01)
-    kel_C = st.slider("kel_C (1/h) - Elimination Rate", 0.01, 1.0, 0.138, step=0.001)
-    Vc_C = st.slider("Vc_C (L) - Central Vol of Distribution", 1.0, 50.0, 20.0, step=0.5)
-    k12_C = st.slider("k12_C (1/h) - Distribution 1->2", 0.0, 5.0, 0.5, step=0.1)
-    k21_C = st.slider("k21_C (1/h) - Distribution 2->1", 0.0, 5.0, 0.5, step=0.1)
-    IC50 = st.slider("IC50 (mg/L) - AADC 50% Inhibitory Conc", 0.01, 2.0, 0.1, step=0.01)
+dog_weight = st.sidebar.number_input("🐕 Dog Weight (kg)", min_value=1.0, max_value=50.0, value=12.0, step=0.5)
+st.sidebar.info("💡 Adjusting weight scales **V_c** linearly and **k_el** allometrically automatically.")
 
-with st.sidebar.expander("Levodopa Parameters", expanded=False):
-    ka_L = st.slider("ka_L (1/h) - Absorption Rate", 0.1, 5.0, 2.0, step=0.1)
-    F_L = st.slider("F_L - Bioavailability", 0.1, 1.0, 0.3, step=0.01)
-    Vc_L = st.slider("Vc_L (L) - Central Vol of Distribution", 1.0, 50.0, 18.0, step=0.5)
-    kAADC = st.slider("kAADC (1/h) - Peripheral AADC Rate", 0.1, 20.0, 5.0, step=0.1)
-    kCOMT = st.slider("kCOMT (1/h) - Peripheral COMT Rate", 0.01, 1.0, 0.05, step=0.01)
-    k12_L = st.slider("k12_L (1/h) - Distribution 1->2", 0.0, 5.0, 1.0, step=0.1)
-    k21_L = st.slider("k21_L (1/h) - Distribution 2->1", 0.0, 5.0, 1.0, step=0.1)
+with st.sidebar.expander("Carbidopa Parameters (Ref: 12kg)", expanded=False):
+    ka_C = slider_input("ka_C (1/h) - Absorption Rate", 0.1, 5.0, 1.04, 0.01, "ka_C")
+    F_C = slider_input("F_C - Bioavailability", 0.1, 1.0, 0.88, 0.01, "F_C")
+    kel_C = slider_input("kel_C (1/h) - Elimination Rate", 0.01, 1.0, 0.138, 0.001, "kel_C")
+    Vc_C = slider_input("Vc_C (L) - Central Vol of Distribution", 1.0, 50.0, 20.0, 0.5, "Vc_C")
+    k12_C = slider_input("k12_C (1/h) - Distribution 1->2", 0.0, 5.0, 0.5, 0.1, "k12_C")
+    k21_C = slider_input("k21_C (1/h) - Distribution 2->1", 0.0, 5.0, 0.5, 0.1, "k21_C")
+    IC50 = slider_input("IC50 (mg/L) - AADC 50% Inhibitory Conc", 0.01, 2.0, 0.1, 0.01, "IC50")
+
+with st.sidebar.expander("Levodopa Parameters (Ref: 12kg)", expanded=False):
+    ka_L = slider_input("ka_L (1/h) - Absorption Rate", 0.1, 5.0, 2.0, 0.1, "ka_L")
+    F_L = slider_input("F_L - Bioavailability", 0.1, 1.0, 0.3, 0.01, "F_L")
+    Vc_L = slider_input("Vc_L (L) - Central Vol of Distribution", 1.0, 50.0, 18.0, 0.5, "Vc_L")
+    kAADC = slider_input("kAADC (1/h) - Peripheral AADC Rate", 0.1, 20.0, 5.0, 0.1, "kAADC")
+    kCOMT = slider_input("kCOMT (1/h) - Peripheral COMT Rate", 0.01, 1.0, 0.05, 0.01, "kCOMT")
+    k12_L = slider_input("k12_L (1/h) - Distribution 1->2", 0.0, 5.0, 1.0, 0.1, "k12_L")
+    k21_L = slider_input("k21_L (1/h) - Distribution 2->1", 0.0, 5.0, 1.0, 0.1, "k21_L")
 
 with st.sidebar.expander("Blood-Brain Barrier & CNS", expanded=False):
-    kin_BBB = st.slider("kin_BBB (1/h) - Rate into Brain (LAT)", 0.001, 0.5, 0.01, step=0.001)
-    kout_BBB = st.slider("kout_BBB (1/h) - Rate out of Brain", 0.01, 1.0, 0.1, step=0.01)
-    kAADC_brain = st.slider("kAADC_brain (1/h) - Brain DA Formation", 0.1, 5.0, 1.0, step=0.1)
-    kel_DA = st.slider("kel_DA (1/h) - Peripheral DA Elimination", 1.0, 20.0, 10.0, step=0.5)
-    kel_DA_brain = st.slider("kel_DA_brain (1/h) - Brain DA Elimination", 0.1, 10.0, 5.0, step=0.1)
+    kin_BBB = slider_input("kin_BBB (1/h) - Rate into Brain (LAT)", 0.001, 0.5, 0.01, 0.001, "kin_BBB")
+    kout_BBB = slider_input("kout_BBB (1/h) - Rate out of Brain", 0.01, 1.0, 0.1, 0.01, "kout_BBB")
+    kAADC_brain = slider_input("kAADC_brain (1/h) - Brain DA Formation", 0.1, 5.0, 1.0, 0.1, "kAADC_brain")
+    kel_DA = slider_input("kel_DA (1/h) - Peripheral DA Elimination", 1.0, 20.0, 10.0, 0.5, "kel_DA")
+    kel_DA_brain = slider_input("kel_DA_brain (1/h) - Brain DA Elimination", 0.1, 10.0, 5.0, 0.1, "kel_DA_brain")
 
 params = {
+    'weight': dog_weight,
     'ka_C': ka_C, 'F_C': F_C, 'kel_C': kel_C, 'k12_C': k12_C, 'k21_C': k21_C, 'Vc_C': Vc_C, 'IC50': IC50,
     'ka_L': ka_L, 'F_L': F_L, 'kAADC': kAADC, 'kCOMT': kCOMT, 'k12_L': k12_L, 'k21_L': k21_L,
     'kin_BBB': kin_BBB, 'kout_BBB': kout_BBB, 'Vc_L': Vc_L, 'kAADC_brain': kAADC_brain,
@@ -144,15 +177,22 @@ rate_C = make_rate_func(time_arr, carbi_mass)
 def pk_model(y, t, params, rate_L, rate_C):
     C_gi, C_cent, C_peri, L_gi, L_cent, L_peri, L_brain, DA_peri, DA_brain = y
     
-    # Carbidopa parameters
-    ka_C, F_C, kel_C, k12_C, k21_C, Vc_C, IC50 = params['ka_C'], params['F_C'], params['kel_C'], params['k12_C'], params['k21_C'], params['Vc_C'], params['IC50']
+    wt_ratio = params['weight'] / 12.0
     
-    # Levodopa parameters
-    ka_L, F_L, kAADC, kCOMT, k12_L, k21_L = params['ka_L'], params['F_L'], params['kAADC'], params['kCOMT'], params['k12_L'], params['k21_L']
-    kin_BBB, kout_BBB, Vc_L, kAADC_brain = params['kin_BBB'], params['kout_BBB'], params['Vc_L'], params['kAADC_brain']
+    # Carbidopa parameters (Scaled by weight)
+    ka_C, F_C, k12_C, k21_C, IC50 = params['ka_C'], params['F_C'], params['k12_C'], params['k21_C'], params['IC50']
+    Vc_C = params['Vc_C'] * wt_ratio
+    kel_C = params['kel_C'] * (wt_ratio ** -0.25)
+    
+    # Levodopa parameters (Scaled by weight)
+    ka_L, F_L, kCOMT, k12_L, k21_L = params['ka_L'], params['F_L'], params['kCOMT'], params['k12_L'], params['k21_L']
+    kin_BBB, kout_BBB, kAADC_brain = params['kin_BBB'], params['kout_BBB'], params['kAADC_brain']
+    Vc_L = params['Vc_L'] * wt_ratio
+    kAADC = params['kAADC'] * (wt_ratio ** -0.25) # Metabolic rate scales allometrically
     
     # Dopamine parameters
-    kel_DA, kel_DA_brain = params['kel_DA'], params['kel_DA_brain']
+    kel_DA = params['kel_DA'] * (wt_ratio ** -0.25)
+    kel_DA_brain = params['kel_DA_brain'] * (wt_ratio ** -0.25)
     
     R_L = rate_L(t)
     R_C = rate_C(t)
@@ -181,13 +221,18 @@ with tab_dashboard:
     
     sol = odeint(pk_model, y0, t_sim, args=(params, rate_L, rate_C))
     
-    C_plasma = sol[:, 1] / Vc_C
-    L_plasma = sol[:, 4] / Vc_L
+    wt_ratio = params['weight'] / 12.0
+    Vc_C_adj = params['Vc_C'] * wt_ratio
+    Vc_L_adj = params['Vc_L'] * wt_ratio
+    
+    C_plasma = sol[:, 1] / Vc_C_adj
+    L_plasma = sol[:, 4] / Vc_L_adj
     L_brain_mass = sol[:, 6]
     DA_peri_mass = sol[:, 7]
     DA_brain_mass = sol[:, 8]
     
-    V_brain = 0.12 # Assume Brain Volume is 1% of total body mass (~0.12 L)
+    # Brain Volume is ~1% of body weight
+    V_brain = 0.01 * params['weight']
     L_brain_conc = L_brain_mass / V_brain
     DA_brain_conc = DA_brain_mass / V_brain
     
@@ -202,7 +247,7 @@ with tab_dashboard:
     
     # --- Plotting ---
     fig = make_subplots(rows=2, cols=1, shared_xaxes=True, 
-                        subplot_titles=("<b>Levodopa and Carbidopa Plasma Concentrations</b>",
+                        subplot_titles=(f"<b>Levodopa & Carbidopa Plasma Conc. (Dog: {params['weight']}kg)</b>",
                                         "<b>Dopamine Concentrations (Peripheral vs Brain)</b>"),
                         vertical_spacing=0.1)
     
