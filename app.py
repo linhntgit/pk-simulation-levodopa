@@ -27,13 +27,26 @@ Welcome to the interactive Pharmacokinetic (PK) simulation! This application use
 def mermaid(code: str):
     components.html(
         f"""
-        <div class="mermaid" style="display: flex; justify-content: center;">
+        <div class="mermaid" style="display: flex; justify-content: center; width: 100%;">
             {code}
         </div>
         <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
-        <script>mermaid.initialize({{startOnLoad:true, theme: 'base', themeVariables: {{ primaryColor: '#f4f4f9', primaryBorderColor: '#ccc', lineColor: '#999', fontFamily: 'Inter, sans-serif' }}}});</script>
+        <script>
+            mermaid.initialize({{startOnLoad: false, theme: 'base', themeVariables: {{ primaryColor: '#f4f4f9', primaryBorderColor: '#ccc', lineColor: '#999', fontFamily: 'Inter, sans-serif' }}}});
+            
+            const observer = new IntersectionObserver((entries) => {{
+                entries.forEach(entry => {{
+                    if(entry.isIntersecting) {{
+                        mermaid.init(undefined, ".mermaid");
+                        observer.disconnect();
+                    }}
+                }});
+            }});
+            observer.observe(document.querySelector(".mermaid"));
+        </script>
         """,
-        height=700
+        height=700,
+        scrolling=True
     )
 
 # --- UI Sidebar ---
