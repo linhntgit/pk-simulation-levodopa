@@ -227,18 +227,18 @@ with tab_model:
     mermaid_code = """
     %%{init: {'flowchart': {'curve': 'basis', 'nodeSpacing': 50, 'rankSpacing': 60}}}%%
     graph LR
-        subgraph Formulation [💊 Tablet Formulation]
+        subgraph Formulation [<b>💊 Tablet Formulation</b>]
             direction TB
             Tablet((Tablet))
         end
 
-        subgraph GI_Tract [Gut / GI Tract]
+        subgraph GI_Tract [<b>Gut / GI Tract</b>]
             direction TB
             C_gi(Carbidopa GI)
             L_gi(Levodopa GI)
         end
 
-        subgraph Central_Compartment [Central / Plasma Compartment]
+        subgraph Central_Compartment [<b>Central / Plasma Compartment</b>]
             direction TB
             C_cent([Carbidopa Plasma])
             L_cent([Levodopa Plasma])
@@ -246,13 +246,13 @@ with tab_model:
             3OMD(3-OMD)
         end
 
-        subgraph Peripheral_Tissue [Peripheral Tissue]
+        subgraph Peripheral_Tissue [<b>Peripheral Tissue</b>]
             direction TB
             C_peri(Carbidopa Tissue)
             L_peri(Levodopa Tissue)
         end
 
-        subgraph CNS [Brain / CNS Compartment]
+        subgraph CNS [<b>Brain / CNS Compartment</b>]
             direction TB
             L_brain([Levodopa Brain])
             DA_brain([Brain DA])
