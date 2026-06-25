@@ -68,10 +68,14 @@ else:
 
 # --- Helper for Slider + Number Input ---
 def slider_input(label, min_val, max_val, default_val, step, key):
-    if key not in st.session_state:
-        st.session_state[key] = default_val
+    slider_key = f"{key}_sl"
+    num_key = f"{key}_num"
     
-    # Split label into short title and description
+    if slider_key not in st.session_state:
+        st.session_state[slider_key] = default_val
+    if num_key not in st.session_state:
+        st.session_state[num_key] = default_val
+    
     parts = label.split(" - ")
     short_label = parts[0]
     desc = parts[1] if len(parts) > 1 else ""
@@ -79,20 +83,17 @@ def slider_input(label, min_val, max_val, default_val, step, key):
     st.markdown(f"**{short_label}** <span style='color:gray;font-size:0.85em'>- {desc}</span>", unsafe_allow_html=True)
     col1, col2 = st.columns([2.5, 1])
     
-    slider_key = f"{key}_sl"
-    num_key = f"{key}_num"
-    
     def sync_sl():
-        st.session_state[key] = st.session_state[slider_key]
+        st.session_state[num_key] = st.session_state[slider_key]
     def sync_num():
-        st.session_state[key] = st.session_state[num_key]
+        st.session_state[slider_key] = st.session_state[num_key]
         
     with col1:
-        st.slider("Hidden", min_value=min_val, max_value=max_val, value=st.session_state[key], step=step, key=slider_key, on_change=sync_sl, label_visibility="collapsed")
+        st.slider("Hidden", min_value=min_val, max_value=max_val, step=step, key=slider_key, on_change=sync_sl, label_visibility="collapsed")
     with col2:
-        st.number_input("Hidden", min_value=min_val, max_value=max_val, value=st.session_state[key], step=step, key=num_key, on_change=sync_num, label_visibility="collapsed")
+        st.number_input("Hidden", min_value=min_val, max_value=max_val, step=step, key=num_key, on_change=sync_num, label_visibility="collapsed")
         
-    return st.session_state[key]
+    return st.session_state[slider_key]
 
 
 # --- Parameters Sidebar ---
